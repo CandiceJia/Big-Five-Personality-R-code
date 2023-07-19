@@ -1,0 +1,166 @@
+---
+title: "Big Five Personality Data"
+author: "Candice"
+date: "2023-06-05"
+output: html_document
+---
+```{r}
+# Load necessary packages
+library(readxl)
+library(dplyr)
+
+# Read Excel file
+data <- read_excel("THE BIG FIVE PERSONALITY TEST(1-44).xlsx", sheet = "Sheet1")
+
+# Rename columns D to BK as Q1~Q60
+colnames(data)[4:63] <- paste0("Q", 1:60)
+
+# Display data to check changes
+head(data)
+```
+
+
+```{r}
+# Select all question columns and subtract 1
+data[,paste0("Q", 1:60)] <- data[,paste0("Q", 1:60)] - 1
+# Function for reverse scoring
+reverse_score <- function(column) {
+  return(sapply(column, function(x) {
+    switch(as.character(x),
+      '0' = '4',
+      '1' = '3',
+      '2' = '2',
+      '3' = '1',
+      '4' = '0'
+    )
+  }))
+}
+# Modify scores for reverse scoring items
+reverse_cols <- c(1,16,31,46,12,17,27,42,57,18,23,28,33,48,9,14,19,24,39,44,54,59,15,30,45,55) 
+data[paste0("Q", reverse_cols)] <- lapply(data[paste0("Q", reverse_cols)], reverse_score)
+# Get column names for all questions
+question_columns <- paste0("Q", 1:60)
+
+# Loop over all question columns
+for (col in question_columns) {
+  # Check if the column is character type
+  if (is.character(data[[col]])) {
+    # Try converting character type data to numeric
+    data[[col]] <- as.numeric(as.character(data[[col]]))
+  }
+}
+# Calculate total score for each dimension
+data$Neuroticism <- rowSums(data[paste0("Q", c(1,6,11,16,21,26,31,36,41,46,51,56))])
+data$Extraversion <- rowSums(data[paste0("Q", c(2,7,12,17,22,27,32,37,42,47,52,57))])
+data$Openness <- rowSums(data[paste0("Q", c(3,8,13,18,23,28,33,38,43,48,53,58))])
+data$Agreeableness <- rowSums(data[paste0("Q", c(4,9,14,19,24,29,34,39,44,49,54,59))])
+data$Conscientiousness <- rowSums(data[paste0("Q", c(5,10,15,20,25,30,35,40,45,50,55,60))])
+
+# Display data to check changes
+head(data)
+```
+
+```{r}
+# Create new data frame
+new_data <- data.frame(
+  "Unique_Code" = data$'Unique Code',
+  "Neuroticism" = data$Neuroticism,
+  "Extraversion" = data$Extraversion,
+  "Openness" = data$Openness,
+  "Agreeableness" = data$Agreeableness,
+  "Conscientiousness" = data$Conscientiousness
+)
+
+# View new data frame
+head(new_data)
+```
+
+```{r}
+# Read new file
+new_file <- read_excel("Demographic Form(1-42).xlsx")
+
+# Ensure that column names are in the correct case
+colnames(new_file) <- tolower(colnames(new_file))
+
+# Merge datasets on the 'unique code' column
+merged_data <- merge(new_data, new_file[c("unique code", "gender")], by.x = "Unique_Code", by.y = "unique code")
+```
+
+```{r}
+# Neuroticism 
+# For Male
+merged_data$Neuroticism_Rank[merged_data$gender == "Male"] <- as.character(cut(merged_data$Neuroticism[merged_data$gender == "Male"],
+     breaks = c(-Inf, 9, 16, 24, 31, Inf),
+     labels = c("Very Low", "Low", "Average", "High", "Very High"),
+     include.lowest = TRUE,
+     ordered_result = TRUE))
+
+# For Female
+merged_data$Neuroticism_Rank[merged_data$gender == "Female"] <- as.character(cut(merged_data$Neuroticism[merged_data$gender == "Female"],
+     breaks = c(-Inf, 10, 18, 27, 35, Inf),
+     labels = c("Very Low", "Low", "Average", "High", "Very High"),
+     include.lowest = TRUE,
+     ordered_result = TRUE))
+# Extraversion
+# For Male
+merged_data$Extraversion_Rank[merged_data$gender == "Male"] <- as.character(cut(merged_data$Extraversion[merged_data$gender == "Male"],
+     breaks = c(-Inf, 18, 24, 31, 37, Inf),
+     labels = c("Very Low", "Low", "Average", "High", "Very High"),
+     include.lowest = TRUE,
+     ordered_result = TRUE))
+
+# For Female
+merged_data$Extraversion_Rank[merged_data$gender == "Female"] <- as.character(cut(merged_data$Extraversion[merged_data$gender == "Female"],
+     breaks = c(-Inf, 20, 26, 33, 39, Inf),
+     labels = c("Very Low", "Low", "Average", "High", "Very High"),
+     include.lowest = TRUE,
+     ordered_result = TRUE))
+# Openness
+# For Male
+merged_data$Openness_Rank[merged_data$gender == "Male"] <- as.character(cut(merged_data$Openness[merged_data$gender == "Male"],
+     breaks = c(-Inf, 18, 24, 31, 38, Inf),
+     labels = c("Very Low", "Low", "Average", "High", "Very High"),
+     include.lowest = TRUE,
+     ordered_result = TRUE))
+
+# For Female
+merged_data$Openness_Rank[merged_data$gender == "Female"] <- as.character(cut(merged_data$Openness[merged_data$gender == "Female"],
+     breaks = c(-Inf, 20, 26, 33, 39, Inf),
+     labels = c("Very Low", "Low", "Average", "High", "Very High"),
+     include.lowest = TRUE,
+     ordered_result = TRUE))
+# Agreeableness
+# For Male
+merged_data$Agreeableness_Rank[merged_data$gender == "Male"] <- as.character(cut(merged_data$Agreeableness[merged_data$gender == "Male"],
+     breaks = c(-Inf, 22, 27, 34, 39, Inf),
+     labels = c("Very Low", "Low", "Average", "High", "Very High"),
+     include.lowest = TRUE,
+     ordered_result = TRUE))
+
+# For Female
+merged_data$Agreeableness_Rank[merged_data$gender == "Female"] <- as.character(cut(merged_data$Agreeableness[merged_data$gender == "Female"],
+     breaks = c(-Inf, 25, 31, 37, 43, Inf),
+     labels = c("Very Low", "Low", "Average", "High", "Very High"),
+     include.lowest = TRUE,
+     ordered_result = TRUE))
+
+# Conscientiousness
+# For Male
+merged_data$Conscientiousness_Rank[merged_data$gender == "Male"] <- as.character(cut(merged_data$Conscientiousness[merged_data$gender == "Male"],
+     breaks = c(-Inf, 23, 29, 36, 42, Inf),
+     labels = c("Very Low", "Low", "Average", "High", "Very High"),
+     include.lowest = TRUE,
+     ordered_result = TRUE))
+
+# For Female
+merged_data$Conscientiousness_Rank[merged_data$gender == "Female"] <- as.character(cut(merged_data$Conscientiousness[merged_data$gender == "Female"],
+     breaks = c(-Inf, 23, 30, 37, 43, Inf),
+     labels = c("Very Low", "Low", "Average", "High", "Very High"),
+     include.lowest = TRUE,
+     ordered_result = TRUE))
+```
+
+```{r}
+# Export the data to a CSV file
+write.csv(merged_data, "Big Five Personality Data/merged_data.csv", row.names = FALSE)
+```
