@@ -1,5 +1,3 @@
-# Big-Five-Personality-R-code
-This code is useful for those who are willing to classify participants as "OCEAN" by using NEO-FFI data
 
 # Reward Mechanism Data Analysis
 
