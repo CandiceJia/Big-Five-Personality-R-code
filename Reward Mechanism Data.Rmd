@@ -1,5 +1,5 @@
 ---
-title: "Reward Machenism Data"
+title: "Reward Mechanism Data"
 author: "Candice"
 date: "2023-07-24"
 output: html_document
@@ -227,23 +227,23 @@ model_interactions_weekend <- lm(daily_amount ~ O * reward_condition + C * rewar
                             N * reward_condition, data = Personality_reward_daily_weekend)
 model_summary <- summary(model_interactions_weekend)
 
-# 创建高N组和低N组的数据子集
+# Create data subsets for high N group and low N group
 high_N_data <- subset(Personality_reward_daily_weekdays, N > 3)
 low_N_data <- subset(Personality_reward_daily_weekdays, N <= 3)
 
-# 在高N组中运行交互作用模型
+# Run interaction model in high N group
 model_interactions_weekdays_high <- lm(daily_amount ~ O * reward_scheme + C * reward_scheme + 
                                         E * reward_scheme + A * reward_scheme + 
                                         N * reward_scheme, data = high_N_data)
 summary(model_interactions_weekdays_high)
 
-# 在低N组中运行交互作用模型
+# Run interaction model in low N group
 model_interactions_weekdays_low <- lm(daily_amount ~ O * reward_condition + C * reward_condition + 
                                        E * reward_condition + A * reward_condition + 
                                        N * reward_condition, data = low_N_data)
 summary(model_interactions_weekdays_low)
 
-# 使用 glance 函数获取模型级别的统计信息
+# Use the glance function to get model-level statistics
 glance_results <- glance(model_interactions_weekdays)
 write.csv(glance_results, "glance_results_weekdays.csv")
 
@@ -262,28 +262,28 @@ write.csv(model_interactions_weekdays, "model_interactions_weekdays.csv", row.na
 ```
 
 ```{r}
-# 提取所需的列
+# Extract required columns
 C_data <- Personality_reward_daily_weekdays[c("C", "reward_scheme", "daily_amount")]
 
-# 查看前几行以确保正确提取
+# View first few rows to ensure correct extraction
 head(C_data)
 
-# 可以通过散点图来检查N和daily_amount之间是否有可视化趋势
+# Check for a visual trend between N and daily_amount via scatterplot
 plot(C_data$C, C_data$daily_amount, main="C Index vs Daily Amount", xlab="C Index", ylab="Daily Amount")
 
-# 对N和daily_amount进行线性回归分析，检查N是否对daily_amount有显著影响
+# Conduct linear regression analysis on N and daily_amount to check if N has a significant effect on daily_amount
 model <- lm(daily_amount ~ C, data=C_data)
 summary(model)
 
-# 将数据分为高N组和低N组
+# Split the data into high N group and low N group
 high_O_data <- subset(O_data, O > 3)
 low_O_data <- subset(O_data, O <= 3)
 
-# 对高N组运行线性模型
+# Run linear model for high N group
 model_high <- lm(daily_amount ~ O, data=high_O_data)
 summary(model_high)
 
-# 对低N组运行线性模型
+# Run linear model for low N group
 model_low <- lm(daily_amount ~ N, data=low_N_data)
 summary(model_low)
 
