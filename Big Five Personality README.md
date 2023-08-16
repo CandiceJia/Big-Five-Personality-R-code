@@ -5,7 +5,7 @@
 
 ## Overview
 
-This project focuses on processing and analyzing the "Big Five Personality Test" data. The goal is to reformat, score, and merge the data with demographic information, then rank individual scores based on gender-specific criteria.
+This project focuses on processing and analyzing the "Big Five Personality Test" data. The goal is to reformat, score, and merge the data with demographic information, then rank individual scores based on gender-specific criteria. This code is useful for those who are willing to classify participants as "OCEAN" by using NEO-FFI data.
 
 ## Process Flow
 
